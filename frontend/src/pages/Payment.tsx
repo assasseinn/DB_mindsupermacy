@@ -1,4 +1,5 @@
 import React, { startTransition } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -55,17 +56,38 @@ export default function Payment() {
       alert("Razorpay SDK failed to load. Are you online?");
       return;
     }
-    // You should get the order details (amount, currency, order_id) from your backend for security
-    // For demo purposes, we'll use static values
+    // Create order on backend
+    const orderUrl = "http://localhost:5000/payment/orders";
+    let orderData;
+    try {
+      const { data } = await axios.post(orderUrl, { amount: 19900 }); // 199 INR in paise
+      orderData = data;
+    } catch (err) {
+      alert("Server error. Are you online?");
+      return;
+    }
     const options = {
-      key: "rzp_test_YourKeyHere", // Replace with your Razorpay key
-      amount: 19900, // amount in paise (199 INR)
-      currency: "INR",
+      key: "rzp_test_tpWBB8LOmOpufG", // Razorpay test key id
+      amount: orderData.amount.toString(),
+      currency: orderData.currency,
       name: "MindSupremacy",
       description: "Success Mastery Program",
       image: "/logo.png",
-      handler: function (response: any) {
-        alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+      order_id: orderData.id,
+      handler: async function (response: any) {
+        // Verify payment on backend
+        const verifyUrl = "http://localhost:5000/payment/success";
+        try {
+          const verification = await axios.post(verifyUrl, {
+            orderCreationId: orderData.id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpaySignature: response.razorpay_signature,
+          });
+          alert(verification.data.msg);
+        } catch (err) {
+          alert("Payment verification failed!");
+        }
         startTransition(() => {
           navigate("/");
         });
@@ -82,6 +104,7 @@ export default function Payment() {
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
+
 
   const handleBackToHome = () => {
     navigate("/");
