@@ -20,12 +20,12 @@ export function HeroSection({
       <SacredGeometryBackground />
 
       {/* Floating discount badge */}
-      <div className="absolute top-10 right-10 bg-gradient-to-r from-accent-600/80 to-accent-800/80 backdrop-blur-sm rounded-full px-6 py-3 text-white font-montserrat font-bold shadow-lg transform rotate-3 z-10">
-        <span className="block text-sm tracking-wide">LIMITED TIME</span>
-        <span className="block text-xl">91% OFF</span>
-      </div>
+      <div className="absolute top-4 right-1/2 translate-x-1/2 md:top-10 md:right-10 md:translate-x-0 bg-gradient-to-r from-accent-600/80 to-accent-800/80 backdrop-blur-sm rounded-full px-4 py-2 md:px-6 md:py-3 text-white font-montserrat font-bold shadow-lg transform rotate-3 z-20 w-max max-w-xs md:max-w-none">
+  <span className="block text-xs md:text-sm tracking-wide">LIMITED TIME</span>
+  <span className="block text-lg md:text-xl">91% OFF</span>
+</div>
       
-      <div className="container mx-auto px-4 relative z-10 text-center">
+      <div className="container mx-auto px-4 relative z-10 text-center pt-24 md:pt-0">
         <h1 className="font-montserrat font-extrabold text-white leading-tight mb-6 text-5xl md:text-6xl lg:text-7xl max-w-5xl mx-auto">
           {headline}
         </h1>

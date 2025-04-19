@@ -1,9 +1,9 @@
-import React from "react";
+import React, { startTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/extensions/shadcn/components/separator";
 
 const paymentMethods = [
   { id: "card", name: "Credit/Debit Card", icon: "💳" },
@@ -34,13 +34,53 @@ export default function Payment() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here would be the payment processing logic
-    console.log("Processing payment", formData);
-    // For now just show a success message
-    alert("Payment successful! Your order is being processed.");
-    navigate("/");
+    const res = await loadRazorpayScript();
+    if (!res) {
+      alert("Razorpay SDK failed to load. Are you online?");
+      return;
+    }
+    // You should get the order details (amount, currency, order_id) from your backend for security
+    // For demo purposes, we'll use static values
+    const options = {
+      key: "rzp_test_YourKeyHere", // Replace with your Razorpay key
+      amount: 19900, // amount in paise (199 INR)
+      currency: "INR",
+      name: "MindSupremacy",
+      description: "Success Mastery Program",
+      image: "/logo.png",
+      handler: function (response: any) {
+        alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+        startTransition(() => {
+          navigate("/");
+        });
+      },
+      prefill: {
+        name: formData.name,
+        email: formData.email,
+      },
+      theme: {
+        color: "#B38D4D"
+      }
+    };
+    // @ts-ignore
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   const handleBackToHome = () => {
@@ -235,49 +275,7 @@ export default function Payment() {
                     ))}
                   </div>
                   
-                  {selectedPayment === "card" && (
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="block text-white/80 text-sm font-medium">Card Number</label>
-                        <input 
-                          type="text" 
-                          name="cardNumber"
-                          placeholder="1234 5678 9012 3456"
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-300"
-                          maxLength={19}
-                          value={formData.cardNumber}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="block text-white/80 text-sm font-medium">Expiry Date</label>
-                          <input 
-                            type="text" 
-                            name="expiryDate"
-                            placeholder="MM/YY"
-                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-300"
-                            maxLength={5}
-                            value={formData.expiryDate}
-                            onChange={handleChange}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="block text-white/80 text-sm font-medium">CVV</label>
-                          <input 
-                            type="text" 
-                            name="cvv"
-                            placeholder="123"
-                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-300"
-                            maxLength={3}
-                            value={formData.cvv}
-                            onChange={handleChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  
                 </div>
                 
                 <Separator className="bg-white/10" />

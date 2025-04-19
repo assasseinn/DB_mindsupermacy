@@ -8,7 +8,7 @@ interface Props {
 export const OuterErrorBoundary = ({ children }: Props) => {
   return (
     <ErrorBoundary
-      fallback={null}
+      fallbackRender={() => null}
       onError={(error) => {
         console.error("Caught error in AppWrapper", error.message, error.stack);
       }}

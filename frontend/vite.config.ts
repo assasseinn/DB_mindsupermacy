@@ -1,4 +1,4 @@
-import react from "@vitejs/plugin-react";
+import pluginReact from "@vitejs/plugin-react";
 import "dotenv/config";
 import path from "node:path";
 import { defineConfig, splitVendorChunkPlugin } from "vite";
@@ -67,7 +67,7 @@ const buildVariables = () => {
 // https://vite.dev/config/
 export default defineConfig({
 	define: buildVariables(),
-	plugins: [react(), splitVendorChunkPlugin(), tsConfigPaths(), injectHTML()],
+	plugins: [pluginReact(), splitVendorChunkPlugin(), tsConfigPaths(), injectHTML()],
 	server: {
 		proxy: {
 			"/routes": {
@@ -78,11 +78,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			resolve: {
-				alias: {
-					"@": path.resolve(__dirname, "./src"),
-				},
-			},
+			"@": path.resolve(__dirname, "./src"),
 		},
 	},
 });

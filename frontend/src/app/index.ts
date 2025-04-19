@@ -23,7 +23,7 @@ export {
   WS_API_URL,
   mode,
 } from "../constants";
-export * from "./auth";
+export { login, signup, logout, getUser } from "./auth";
 
 import brain from "../brain";
 export const backend = brain;

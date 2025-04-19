@@ -1,7 +1,8 @@
+import * as React from "react";
 import { useEffect } from "react";
-import { MessageEmitter } from "../dev-components/Beacon";
-import { InternalErrorBoundary } from "../dev-components/InternalErrorBoundary";
-import { UserErrorBoundary } from "../dev-components/UserErrorBoundary";
+// import { MessageEmitter } from "../dev-components/Beacon";
+// import { InternalErrorBoundary } from "../dev-components/InternalErrorBoundary";
+// import { UserErrorBoundary } from "../dev-components/UserErrorBoundary";
 
 interface Props {
   children: React.ReactNode;
@@ -28,13 +29,9 @@ export const DevTools = ({ children, shouldRender }: Props) => {
   }, [shouldRender]);
 
   if (shouldRender) {
-    return (
-      <InternalErrorBoundary>
-        <UserErrorBoundary>
-          <MessageEmitter>{children}</MessageEmitter>
-        </UserErrorBoundary>
-      </InternalErrorBoundary>
-    );
+    // Dev tools wrappers commented out due to missing components
+    return <>{children}</>;
+
   }
 
   return <>{children}</>;
