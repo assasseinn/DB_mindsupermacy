@@ -1,5 +1,6 @@
 import React, { startTransition } from "react";
 import axios from "axios";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -74,23 +75,11 @@ export default function Payment() {
       description: "Success Mastery Program",
       image: "/logo.png",
       order_id: orderData.id,
-      handler: async function (response: any) {
-        // Verify payment on backend
-        const verifyUrl = "http://localhost:5000/payment/success";
-        try {
-          const verification = await axios.post(verifyUrl, {
-            orderCreationId: orderData.id,
-            razorpayPaymentId: response.razorpay_payment_id,
-            razorpayOrderId: response.razorpay_order_id,
-            razorpaySignature: response.razorpay_signature,
-          });
-          alert(verification.data.msg);
-        } catch (err) {
-          alert("Payment verification failed!");
-        }
-        startTransition(() => {
-          navigate("/");
-        });
+      handler: function (response: any) {
+        // Do not make this async! Defer async work after synchronous input
+        setTimeout(() => {
+          verifyAndSavePayment(response, orderData);
+        }, 0);
       },
       prefill: {
         name: formData.name,
