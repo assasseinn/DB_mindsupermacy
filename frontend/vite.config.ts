@@ -1,16 +1,16 @@
-import pluginReact from "@vitejs/plugin-react";
 import "dotenv/config";
 import path from "node:path";
 import { defineConfig, splitVendorChunkPlugin } from "vite";
 import injectHTML from "vite-plugin-html-inject";
 import tsConfigPaths from "vite-tsconfig-paths";
+// @ts-ignore: module has a default export
+import react from "@vitejs/plugin-react";
 
 type Extension = {
 	name: string;
 	version: string;
 	config: Record<string, unknown>;
 };
-
 
 const listExtensions = (): Extension[] => {
 	if (process.env.DATABUTTON_EXTENSIONS) {
@@ -62,7 +62,7 @@ const buildVariables = () => {
 // https://vite.dev/config/
 export default defineConfig({
 	define: buildVariables(),
-	plugins: [pluginReact(), splitVendorChunkPlugin(), tsConfigPaths(), injectHTML()],
+	plugins: [react(), splitVendorChunkPlugin(), tsConfigPaths(), injectHTML()],
 	server: {
 		proxy: {
 			"/routes": {
