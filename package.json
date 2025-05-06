@@ -4,7 +4,7 @@
     "@mapbox/mapbox-gl-draw": "^1.4.2",
     "@tiptap/pm": "^2.12.0",
     "i18next": "^23.11.5",
-    "mapbox-gl": "^2.14.1"
+    "mapbox-gl": "^1.13.3"
   },
   "devDependencies": {
     "@types/web": "^0.0.111",
