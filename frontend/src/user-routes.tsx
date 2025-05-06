@@ -6,13 +6,22 @@ import { RouteObject } from "react-router-dom";
 
 
 const App = lazy(() => import("./pages/App.tsx"));
-const Course = lazy(() => import("./pages/Course.tsx"));
-const Payment = lazy(() => import("./pages/Payment.tsx"));
+const Payment = lazy(() => import("./pages/PaymentProtected.tsx"));
+const Course = lazy(() => import("./pages/CourseProtected.tsx"));
+const Login = lazy(() => import("./pages/Login.tsx"));
+
+import { SuspenseWrapper } from "./router";
+
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.tsx"));
+const TermsOfUse = lazy(() => import("./pages/TermsOfUse.tsx"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy.tsx"));
 
 export const userRoutes: RouteObject[] = [
-
-	{ path: "/", element: <App />},
-	{ path: "/course", element: <Course />},
-	{ path: "/payment", element: <Payment />},
-
+	{ path: "/", element: <SuspenseWrapper><App /></SuspenseWrapper>},
+	{ path: "/login", element: <SuspenseWrapper><Login /></SuspenseWrapper>},
+	{ path: "/payment", element: <SuspenseWrapper><Payment /></SuspenseWrapper>},
+	{ path: "/course", element: <SuspenseWrapper><Course /></SuspenseWrapper>},
+	{ path: "/privacy-policy", element: <SuspenseWrapper><PrivacyPolicy /></SuspenseWrapper>},
+	{ path: "/terms-of-use", element: <SuspenseWrapper><TermsOfUse /></SuspenseWrapper>},
+	{ path: "/refund-policy", element: <SuspenseWrapper><RefundPolicy /></SuspenseWrapper>},
 ];

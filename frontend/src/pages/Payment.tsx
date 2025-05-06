@@ -20,8 +20,48 @@ const securityBadges = [
   { icon: "⚡", label: "Instant Delivery" },
 ];
 
-export default function Payment() {
+import { ProtectedRoute } from "../components/ProtectedRoute";
+
+export default function PaymentPage() {
   const navigate = useNavigate();
+
+  // Verify payment with backend and save to Supabase
+  const verifyAndSavePayment = async (response: any, orderData: any) => {
+    try {
+      // 1. Verify payment with backend
+      const verifyUrl = "http://localhost:5000/payment/verify";
+      const { data: verifyResult } = await axios.post(verifyUrl, {
+        ...response,
+        order_id: orderData.id,
+        user_email: formData.email,
+        amount: orderData.amount,
+      });
+      if (!verifyResult.success) {
+        alert("Payment verification failed. Please contact support.");
+        return;
+      }
+      // 2. Save payment info to Supabase
+      const { error } = await supabase.from("payments").insert([
+        {
+          user_email: formData.email,
+          amount: orderData.amount,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          status: "success",
+        },
+      ]);
+      if (error) {
+        alert("Payment succeeded but failed to save record. Please contact support.");
+        return;
+      }
+      // 3. Navigate to course
+      navigate("/course");
+    } catch (err) {
+      alert("An error occurred verifying your payment. Please contact support.");
+      console.error(err);
+    }
+  };
+
   const [selectedPayment, setSelectedPayment] = React.useState("card");
   const [formData, setFormData] = React.useState({
     name: "",

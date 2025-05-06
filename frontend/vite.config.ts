@@ -11,9 +11,6 @@ type Extension = {
 	config: Record<string, unknown>;
 };
 
-enum ExtensionName {
-	FIREBASE_AUTH = "firebase-auth",
-}
 
 const listExtensions = (): Extension[] => {
 	if (process.env.DATABUTTON_EXTENSIONS) {
@@ -56,9 +53,7 @@ const buildVariables = () => {
 		__APP_DEPLOY_USERNAME__: JSON.stringify(""),
 		__APP_DEPLOY_APPNAME__: JSON.stringify(""),
 		__APP_DEPLOY_CUSTOM_DOMAIN__: JSON.stringify(""),
-		__FIREBASE_CONFIG__: JSON.stringify(
-			getExtensionConfig(ExtensionName.FIREBASE_AUTH),
-		),
+
 	};
 
 	return defines;

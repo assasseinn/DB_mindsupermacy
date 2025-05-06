@@ -3,7 +3,30 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { chapters, ChapterData } from "utils/courseData";
 import { PrincipleIcon } from "components/PrincipleIcon";
 
-export default function Course() {
+const audiobookSessions = [
+  { time: "00:00", seconds: 0, title: "Introduction" },
+  { time: "39:35", seconds: 2375, title: "What is a Drifter" },
+  { time: "41:46", seconds: 2506, title: "What is a Non-Drifter" },
+  { time: "01:07:57", seconds: 4077, title: "What to do against Drifting" },
+  { time: "01:24:39", seconds: 5079, title: "What's the first step to break the Habit of Drifting" },
+  { time: "01:45:43", seconds: 6343, title: "The 1st Principle: Definiteness" },
+  { time: "02:08:50", seconds: 7730, title: "The Public School System" },
+  { time: "02:19:38", seconds: 8378, title: "Sin" },
+  { time: "02:22:27", seconds: 8547, title: "The 2nd Principle: Mastery over Self" },
+  { time: "02:40:54", seconds: 9654, title: "The 3rd Principle: Learning from Adversity" },
+  { time: "02:47:50", seconds: 10170, title: "Hypnotic Rhythm and Relationships" },
+  { time: "03:04:05", seconds: 11045, title: "The 4th Principle: Environmental Influence" },
+  { time: "03:16:04", seconds: 11764, title: "The 5th Principle: Time" },
+  { time: "03:21:43", seconds: 12043, title: "The 6th Principle: Harmony" },
+  { time: "03:25:28", seconds: 12328, title: "The 7th Principle: Caution" },
+  { time: "03:29:35", seconds: 12575, title: "Summary" }
+];
+
+const AUDIOBOOK_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"; // Replace with your actual audiobook URL
+
+import { ProtectedRoute } from "../components/ProtectedRoute";
+
+export default function CoursePage() {
   const [searchParams] = useSearchParams();
   const principleId = searchParams.get("id") || "three-feet";
   const navigate = useNavigate();
@@ -24,9 +47,106 @@ export default function Course() {
     window.scrollTo(0, 0);
   };
 
+  // Audiobook player state
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
+
+  // Setup audio element
+  React.useEffect(() => {
+    const audioEl = new Audio(AUDIOBOOK_URL);
+    setAudio(audioEl);
+    audioEl.addEventListener("loadedmetadata", () => setDuration(audioEl.duration));
+    audioEl.addEventListener("timeupdate", () => setCurrentTime(audioEl.currentTime));
+    audioEl.addEventListener("ended", () => setIsPlaying(false));
+    return () => {
+      audioEl.pause();
+      audioEl.src = "";
+      setAudio(null);
+    };
+  }, []);
+
+  // Sync current session index as audio plays
+  React.useEffect(() => {
+    const idx = audiobookSessions.findIndex((s, i) =>
+      currentTime >= s.seconds && (i === audiobookSessions.length - 1 || currentTime < audiobookSessions[i + 1].seconds)
+    );
+    setCurrentSessionIdx(idx === -1 ? 0 : idx);
+  }, [currentTime]);
+
+  // Play/pause controls
+  const handlePlayPause = () => {
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      audio.play();
+      setIsPlaying(true);
+    }
+  };
+  // Seek to session
+  const handleSessionClick = (idx: number) => {
+    if (!audio) return;
+    audio.currentTime = audiobookSessions[idx].seconds;
+    setCurrentTime(audio.currentTime);
+    setCurrentSessionIdx(idx);
+    if (!isPlaying) {
+      audio.play();
+      setIsPlaying(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pb-20">
-      {/* Sacred geometry subtle background pattern */}
+      {/* Audiobook player */}
+      <div className="container mx-auto px-4 pt-8 md:pt-12">
+        <div className="bg-secondary/10 rounded-lg border border-secondary/20 p-6 mb-10 flex flex-col items-center">
+          <h2 className="text-2xl font-bold mb-4">Audiobook Course</h2>
+          <div className="flex items-center space-x-4 mb-4">
+            <button
+              onClick={handlePlayPause}
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-accent/30 hover:bg-accent/50 transition-colors"
+              aria-label={isPlaying ? "Pause" : "Play"}
+            >
+              {isPlaying ? (
+                <svg width="32" height="32" fill="currentColor"><rect x="8" y="8" width="5" height="16" rx="2"/><rect x="19" y="8" width="5" height="16" rx="2"/></svg>
+              ) : (
+                <svg width="32" height="32" fill="currentColor"><polygon points="10,8 26,16 10,24"/></svg>
+              )}
+            </button>
+            <div className="text-lg font-mono">
+              {new Date(currentTime * 1000).toISOString().substr(11, 8)} / {duration ? new Date(duration * 1000).toISOString().substr(11, 8) : "--:--:--"}
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={duration}
+              value={currentTime}
+              onChange={e => {
+                if (!audio) return;
+                audio.currentTime = Number(e.target.value);
+                setCurrentTime(audio.currentTime);
+              }}
+              className="w-64 accent-accent"
+            />
+          </div>
+          <div className="w-full flex flex-col space-y-2">
+            {audiobookSessions.map((session, idx) => (
+              <button
+                key={session.time}
+                onClick={() => handleSessionClick(idx)}
+                className={`flex items-center space-x-4 px-4 py-2 rounded transition-all duration-300 text-left ${idx === currentSessionIdx ? 'bg-accent/30 text-accent font-bold' : 'hover:bg-secondary/20 text-white/80'}`}
+              >
+                <span className="font-mono w-20">{session.time}</span>
+                <span>{session.title}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="fixed inset-0 z-0 opacity-10 pointer-events-none overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-accent/30 rounded-full"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-accent/20 rounded-full"></div>
