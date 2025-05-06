@@ -1,3 +1,8 @@
 {
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.9.1",
+  "dependencies": {
+    "@tiptap/pm": "^2.12.0",
+    "i18next": "^23.11.5",
+    "mapbox-gl": "^1.13.3"
+  }
 }
