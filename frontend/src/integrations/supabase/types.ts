@@ -9,7 +9,29 @@ export type Json =
  export type Database = {
    public: {
      Tables: {
-       [_ in never]: never
+       payments: {
+         Row: {
+           user_email: string;
+           amount: number;
+           razorpay_payment_id: string;
+           razorpay_order_id: string;
+           status: string;
+         };
+         Insert: {
+           user_email: string;
+           amount: number;
+           razorpay_payment_id: string;
+           razorpay_order_id: string;
+           status: string;
+         };
+         Update: {
+           user_email?: string;
+           amount?: number;
+           razorpay_payment_id?: string;
+           razorpay_order_id?: string;
+           status?: string;
+         };
+       }
      }
      Views: {
        [_ in never]: never
