@@ -2,7 +2,6 @@
   "name": "mind-supremacy",
   "private": true,
   "version": "0.0.0",
-  "installConfig": { "pnpMode": "loose" },
   "type": "module",
   "scripts": {
     "dev": "cd frontend && yarn dev",
@@ -46,7 +45,7 @@
     "@mui/material": "6.3.1",
     "@mysten/sui": "1.16.0",
     "@novnc/novnc": "1.6.0-beta",
-    "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
+    "@openai/realtime-api-beta": "git+https://github.com/openai/openai-realtime-api-beta.git",
     "@pdfme/common": "5.3.3",
     "@pdfme/generator": "5.3.3",
     "@pdfme/schemas": "5.3.3",
@@ -283,19 +282,6 @@
     "@types/mixpanel-browser": "^2",
     "@types/node": "^22.14.1",
     "@types/novnc__novnc": "^1",
-    "@types/react": "18.2.62",
-    "@types/react-beautiful-dnd": "^13",
-    "@types/react-big-calendar": "^1",
-    "@types/react-dom": "18.2.19",
-    "@types/react-grid-layout": "^1",
-    "@types/react-helmet": "^6",
-    "@types/react-mentions": "^4",
-    "@types/react-slick": "^0",
-    "@types/react-table": "^7",
-    "@types/react-window": "^1",
-    "@types/recordrtc": "^5",
-    "@types/three": "^0",
-    "@types/vinyl-fs": "^3",
     "@vitejs/plugin-react": "^4.4.0",
     "@vitejs/plugin-react-swc": "3.3.2",
     "autoprefixer": "^10.4.20",
@@ -312,8 +298,10 @@
     "type-fest": "4.6.0",
     "typescript": "5.2.2",
     "typescript-language-server": "4.3.2",
-    "vite": "^6.3.2",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^6.3.2"
+  },
+  "resolutions": {
+    "regl": "^2.0.0"
   },
   "packageManager": "yarn@4.9.1",
   "nodeLinker": "pnpm"
