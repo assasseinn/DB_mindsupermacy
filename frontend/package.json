@@ -5,10 +5,10 @@
   "installConfig": { "pnpMode": "loose" },
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "cd frontend && yarn dev",
+    "build": "cd frontend && yarn build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "start": "cd frontend && yarn start"
   },
   "dependencies": {
     "@11labs/react": "0.0.4",
