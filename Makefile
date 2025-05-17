@@ -1,19 +1,33 @@
-install-backend:
-	chmod +x backend/install.sh
-	chmod +x backend/run.sh
-	cd backend && ./install.sh
-
+# Frontend commands
 install-frontend:
-	chmod +x frontend/install.sh
-	chmod +x frontend/run.sh
-	cd frontend && ./install.sh
+	cd frontend && npm install
+	cd frontend && npm install axios @radix-ui/react-separator embla-carousel-react
 
-install: install-backend install-frontend
+build-frontend:
+	cd frontend && npm run build
 
-run-backend:
-	cd backend && ./run.sh
+dev-frontend:
+	cd frontend && npm run dev
 
-run-frontend:
-	cd frontend && ./run.sh
+# Backend commands
+install-backend:
+	cd backend && pip install -r requirements.txt
 
+dev-backend:
+	cd backend && uvicorn main:app --reload
+
+# Combined commands
+install: install-frontend install-backend
+
+dev: dev-backend dev-frontend
+
+build: build-frontend
+
+# Clean commands
+clean:
+	rm -rf frontend/node_modules
+	rm -rf frontend/dist
+	find . -type d -name "__pycache__" -exec rm -r {} +
+
+# Default target
 .DEFAULT_GOAL := install
