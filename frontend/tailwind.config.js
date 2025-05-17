@@ -1,7 +1,10 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     container: {
       center: true,
@@ -12,9 +15,9 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        montserrat: ["Montserrat", "system-ui", "sans-serif"],
-        inter: ["Inter", "system-ui", "sans-serif"],
-        playfair: ["Playfair Display", "Georgia", "serif"],
+        inter: ['Inter', 'sans-serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
+        playfair: ['Playfair Display', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -27,7 +30,7 @@ module.exports = {
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: '#1A1A1A',
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -39,12 +42,10 @@ module.exports = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#B38D4D",
-          foreground: "#FFFFFF",
-          500: "#B38D4D",
-          600: "#A37C3D",
-          700: "#916C2D", 
-          800: "#7F5C1D", 
+          DEFAULT: '#B38D4D',
+          600: '#B38D4D',
+          700: '#9A7A42',
+          800: '#826838',
         },
         card: {
           DEFAULT: "hsl(var(--card))",
