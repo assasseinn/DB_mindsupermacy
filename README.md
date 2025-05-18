@@ -1,29 +1,40 @@
-# Databutton app
+# Mindsupremacy
 
-This project consists of a FastAPI backend server and a React + TypeScript frontend application exported from Databutton.
+This project consists of a FastAPI backend server and a React + TypeScript frontend application for the Mindsupremacy platform.
+
+## Features
+
+- User authentication and authorization
+- Course content delivery
+- Secure payment processing
+- Responsive design
+- Modern UI/UX
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development servers:
+   ```bash
+   # Start backend
+   npm run backend
+   
+   # Start frontend
+   npm run dev
+   ```
+
+## Tech Stack
+
+- Frontend: React, TypeScript, TailwindCSS
+- Backend: FastAPI, Python
+- Database: Supabase
+- Authentication: Supabase Auth
+- Payment: Razorpay
 
 ## Stack
 
 - React+Typescript frontend with `yarn` as package manager.
-- Python FastAPI server with `uv` as package manager.
-
-## Quickstart
-
-1. Install dependencies:
-
-```bash
-make
-```
-
-2. Start the backend and frontend servers in separate terminals:
-
-```bash
-make run-backend
-make run-frontend
-```
-
-## Gotchas
-
-The backend server runs on port 8000 and the frontend development server runs on port 5173. The frontend Vite server proxies API requests to the backend on port 8000.
-
-Visit <http://localhost:5173> to view the application.
+- Python FastAPI server with `uv`

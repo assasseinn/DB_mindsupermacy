@@ -3,57 +3,26 @@ import path from "node:path";
 import { defineConfig, splitVendorChunkPlugin } from "vite";
 import injectHTML from "vite-plugin-html-inject";
 import tsConfigPaths from "vite-tsconfig-paths";
-// @ts-ignore: module has a default export
 import react from "@vitejs/plugin-react";
 
-type Extension = {
-	name: string;
-	version: string;
-	config: Record<string, unknown>;
-};
-
-const listExtensions = (): Extension[] => {
-	if (process.env.DATABUTTON_EXTENSIONS) {
-		try {
-			return JSON.parse(process.env.DATABUTTON_EXTENSIONS) as Extension[];
-		} catch (err: unknown) {
-			console.error("Error parsing DATABUTTON_EXTENSIONS", err);
-			console.error(process.env.DATABUTTON_EXTENSIONS);
-			return [];
-		}
-	}
-
-	return [];
-};
-
-const extensions = listExtensions();
-
-const getExtensionConfig = (name: string): string => {
-	const extension = extensions.find((it) => it.name === name);
-
-	if (!extension) {
-		console.warn(`Extension ${name} not found`);
-	}
-
-	return JSON.stringify(extension?.config);
-};
-
 const buildVariables = () => {
-	const appId = process.env.DATABUTTON_PROJECT_ID;
+	const isProd = process.env.NODE_ENV === 'production';
+	const apiUrl = isProd ? '/api' : 'http://localhost:8000';
+	const wsApiUrl = isProd ? `wss://${process.env.VERCEL_URL}/api` : 'ws://localhost:8000';
 
 	const defines: Record<string, string> = {
-		__APP_ID__: JSON.stringify(appId),
-		__API_PATH__: JSON.stringify(""),
-		__API_URL__: JSON.stringify("http://localhost:8000"),
-		__WS_API_URL__: JSON.stringify("ws://localhost:8000"),
+		__APP_ID__: JSON.stringify(process.env.VERCEL_PROJECT_ID || ''),
+		__API_PATH__: JSON.stringify("/api"),
+		__API_URL__: JSON.stringify(apiUrl),
+		__WS_API_URL__: JSON.stringify(wsApiUrl),
 		__APP_BASE_PATH__: JSON.stringify("/"),
-		__APP_TITLE__: JSON.stringify("Databutton"),
+		__APP_TITLE__: JSON.stringify("Mindsupremacy"),
 		__APP_FAVICON_LIGHT__: JSON.stringify("/favicon-light.svg"),
 		__APP_FAVICON_DARK__: JSON.stringify("/favicon-dark.svg"),
 		__APP_DEPLOY_USERNAME__: JSON.stringify(""),
 		__APP_DEPLOY_APPNAME__: JSON.stringify(""),
 		__APP_DEPLOY_CUSTOM_DOMAIN__: JSON.stringify(""),
-
+		__APP_VERSION__: JSON.stringify(process.env.npm_package_version),
 	};
 
 	return defines;
@@ -65,15 +34,28 @@ export default defineConfig({
 	plugins: [react(), splitVendorChunkPlugin(), tsConfigPaths(), injectHTML()],
 	server: {
 		proxy: {
-			"/routes": {
+			"/api": {
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,
+				rewrite: (path) => path.replace(/^\/api/, ''),
 			},
 		},
 	},
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
+		},
+	},
+	build: {
+		outDir: 'dist',
+		sourcemap: true,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					vendor: ['react', 'react-dom', 'react-router-dom'],
+					ui: ['@radix-ui/react-separator', 'clsx', 'tailwind-merge'],
+				},
+			},
 		},
 	},
 });

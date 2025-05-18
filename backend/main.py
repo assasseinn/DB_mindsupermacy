@@ -2,7 +2,9 @@ import os
 import pathlib
 import json
 import dotenv
-from fastapi import FastAPI, APIRouter, Depends
+from fastapi import FastAPI, APIRouter, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 dotenv.load_dotenv()
 
@@ -76,7 +78,21 @@ def get_firebase_config() -> dict | None:
 
 def create_app() -> FastAPI:
     """Create the app. This is called by uvicorn with the factory option to construct the app object."""
-    app = FastAPI()
+    app = FastAPI(
+        title="Mindsupremacy API",
+        description="Backend API for Mindsupremacy platform",
+        version="1.0.0"
+    )
+
+    # Configure CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # In production, replace with your frontend domain
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     app.include_router(import_api_routers())
 
     for route in app.routes:
@@ -103,3 +119,24 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Mindsupremacy API"}
+
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy"}
+
+# Error handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"message": "Internal server error", "detail": str(exc)},
+    )
+
+# For local development
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

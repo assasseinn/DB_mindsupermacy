@@ -20,7 +20,7 @@
   },
   "name": "db_mindsupermacy",
   "version": "1.0.0",
-  "description": "This project consists of a FastAPI backend server and a React + TypeScript frontend application exported from Databutton.",
+  "description": "This project consists of a FastAPI backend server and a React + TypeScript frontend application for Mindsupremacy.",
   "main": "index.js",
   "repository": {
     "type": "git",
