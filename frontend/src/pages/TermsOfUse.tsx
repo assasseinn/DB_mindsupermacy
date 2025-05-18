@@ -2,50 +2,77 @@ import React from "react";
 
 export default function TermsOfUse() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-3xl">
-      <h1 className="text-3xl font-bold mb-6 text-accent">Terms of Use</h1>
-      <div className="bg-gray-100 p-4 border-l-4 border-blue-500 mb-8">
-        <strong>Effective:</strong> April 10, 2025
+    <div className="min-h-screen bg-black text-white py-12">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <h1 className="text-4xl font-bold mb-8 text-accent">Terms of Use</h1>
+        
+        <div className="space-y-8">
+          <section className="bg-secondary/10 p-6 rounded-xl border border-accent/20">
+            <h2 className="text-2xl font-semibold mb-4 text-accent">1. Account Requirements</h2>
+            <div className="space-y-4 text-white/80">
+              <p>To access our services, you must:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Provide a valid email address</li>
+                <li>Create a unique password</li>
+                <li>Maintain one account per individual</li>
+                <li>Keep your account credentials secure</li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="bg-secondary/10 p-6 rounded-xl border border-accent/20">
+            <h2 className="text-2xl font-semibold mb-4 text-accent">2. License Grant</h2>
+            <div className="space-y-4 text-white/80">
+              <p>Your purchase grants you:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Lifetime personal access to purchased content</li>
+                <li>Non-transferable license for personal use</li>
+                <li>Access to future updates of the course</li>
+                <li>No commercial redistribution rights</li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="bg-secondary/10 p-6 rounded-xl border border-accent/20">
+            <h2 className="text-2xl font-semibold mb-4 text-accent">3. Prohibited Conduct</h2>
+            <div className="space-y-4 text-white/80">
+              <p>You agree not to:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Share your login credentials</li>
+                <li>Record or reproduce course content</li>
+                <li>Use content for commercial purposes</li>
+                <li>Attempt to reverse engineer our systems</li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="bg-secondary/10 p-6 rounded-xl border border-accent/20">
+            <h2 className="text-2xl font-semibold mb-4 text-accent">4. Payment Terms</h2>
+            <div className="space-y-4 text-white/80">
+              <p>Payment and refund terms:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>All payments are processed securely</li>
+                <li>Prices are subject to change</li>
+                <li>Refunds are subject to our Refund Policy</li>
+                <li>All amounts are in Indian Rupees (₹)</li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="bg-secondary/10 p-6 rounded-xl border border-accent/20">
+            <h2 className="text-2xl font-semibold mb-4 text-accent">5. Modifications</h2>
+            <div className="space-y-4 text-white/80">
+              <p>We reserve the right to:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Update these terms with 30 days notice</li>
+                <li>Modify course content and features</li>
+                <li>Suspend accounts for policy violations</li>
+                <li>Update pricing with prior notice</li>
+              </ul>
+            </div>
+          </section>
+        </div>
       </div>
-
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-blue-600 mb-2">1. Account Requirements</h2>
-        <ul className="list-disc list-inside">
-          <li>Must provide valid email address</li>
-          <li>One account per individual</li>
-          <li>You're responsible for account security</li>
-        </ul>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-blue-600 mb-2">2. License Grant</h2>
-        <p className="mb-2">Your ₹199 purchase grants:</p>
-        <ul className="list-disc list-inside">
-          <li>Lifetime personal access to purchased content</li>
-          <li>Non-transferable license</li>
-          <li>No commercial redistribution rights</li>
-        </ul>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-blue-600 mb-2">3. Prohibited Conduct</h2>
-        <p className="mb-2">You agree not to:</p>
-        <ul className="list-disc list-inside">
-          <li>Share login credentials</li>
-          <li>Reverse engineer our systems</li>
-          <li>Use content for illegal purposes</li>
-        </ul>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-blue-600 mb-2">4. Refund Process</h2>
-        <p className="mb-2">See our Refund Policy for details</p>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-blue-600 mb-2">5. Modifications</h2>
-        <p className="mb-2">We may update these terms with 30 days notice via email</p>
-      </section>
     </div>
   );
 }
