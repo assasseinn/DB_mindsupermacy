@@ -1,4 +1,4 @@
-import React, { startTransition } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/extensions/shadcn/components/separator";
+import { toast } from "react-hot-toast";
 
 const paymentMethods = [
   { id: "card", name: "Credit/Debit Card", icon: "💳" },
@@ -24,43 +25,9 @@ import { ProtectedRoute } from "../components/ProtectedRoute";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
-
-  // Verify payment with backend and save to Supabase
-  const verifyAndSavePayment = async (response: any, orderData: any) => {
-    try {
-      // 1. Verify payment with backend
-      const verifyUrl = "http://localhost:5000/payment/verify";
-      const { data: verifyResult } = await axios.post(verifyUrl, {
-        ...response,
-        order_id: orderData.id,
-        user_email: formData.email,
-        amount: orderData.amount,
-      });
-      if (!verifyResult.success) {
-        alert("Payment verification failed. Please contact support.");
-        return;
-      }
-      // 2. Save payment info to Supabase
-      const { error } = await supabase.from("payments").insert([
-        {
-          user_email: formData.email,
-          amount: orderData.amount,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_order_id: response.razorpay_order_id,
-          status: "success",
-        },
-      ]);
-      if (error) {
-        alert("Payment succeeded but failed to save record. Please contact support.");
-        return;
-      }
-      // 3. Navigate to course
-      navigate("/course");
-    } catch (err) {
-      alert("An error occurred verifying your payment. Please contact support.");
-      console.error(err);
-    }
-  };
+  const [loading, setLoading] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [error, setError] = useState<string | null>(null);
 
   const [selectedPayment, setSelectedPayment] = React.useState("card");
   const [formData, setFormData] = React.useState({
@@ -76,64 +43,144 @@ export default function PaymentPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Verify payment with backend and save to Supabase
+  const verifyAndSavePayment = async (response: any, orderData: any) => {
+    try {
+      setPaymentStatus('processing');
+      setError(null);
+
+      // 1. Verify payment with backend
+      const verifyUrl = `https://kvfngdrucqptgfjqxpyp.supabase.co/functions/v1/payment/verify`;
+      const { data: verifyResult } = await axios.post(verifyUrl, {
+        ...response,
+        order_id: orderData.id,
+        user_email: formData.email,
+        amount: orderData.amount,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!verifyResult.success) {
+        throw new Error("Payment verification failed");
+      }
+
+      // 2. Save payment info to Supabase
+      const { error: dbError } = await supabase.from("payments").insert([
+        {
+          user_email: formData.email,
+          amount: orderData.amount,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          status: "success",
+        },
+      ]);
+
+      if (dbError) {
+        throw new Error("Failed to save payment record");
+      }
+
+      // 3. Send confirmation email
+      await supabase.functions.invoke('send-payment-confirmation', {
+        body: { 
+          email: formData.email,
+          amount: orderData.amount,
+          orderId: orderData.id
+        }
+      });
+
+      setPaymentStatus('success');
+      toast.success('Payment successful! Redirecting to course...');
+      
+      // 4. Navigate to course after a short delay
+      setTimeout(() => {
+        navigate("/course");
+      }, 2000);
+
+    } catch (err: any) {
+      console.error("Payment error:", err);
+      setPaymentStatus('error');
+      setError(err.message || "An error occurred during payment");
+      toast.error(err.message || "Payment failed. Please try again.");
+    }
+  };
+
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => {
-        resolve(true);
-      };
-      script.onerror = () => {
-        resolve(false);
-      };
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await loadRazorpayScript();
-    if (!res) {
-      alert("Razorpay SDK failed to load. Are you online?");
-      return;
-    }
-    // Create order on backend
-    const orderUrl = "http://localhost:5000/payment/orders";
-    let orderData;
-    try {
-      const { data } = await axios.post(orderUrl, { amount: 19900 }); // 199 INR in paise
-      orderData = data;
-    } catch (err) {
-      alert("Server error. Are you online?");
-      return;
-    }
-    const options = {
-      key: "rzp_test_tpWBB8LOmOpufG", // Razorpay test key id
-      amount: orderData.amount.toString(),
-      currency: orderData.currency,
-      name: "MindSupremacy",
-      description: "Success Mastery Program",
-      image: "/logo.png",
-      order_id: orderData.id,
-      handler: function (response: any) {
-        // Do not make this async! Defer async work after synchronous input
-        setTimeout(() => {
-          verifyAndSavePayment(response, orderData);
-        }, 0);
-      },
-      prefill: {
-        name: formData.name,
-        email: formData.email,
-      },
-      theme: {
-        color: "#B38D4D"
-      }
-    };
-    // @ts-ignore
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  };
+    setLoading(true);
+    setError(null);
 
+    try {
+      // Load Razorpay script
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error("Failed to load payment gateway");
+      }
+
+      // Create order
+      const orderUrl = `https://kvfngdrucqptgfjqxpyp.supabase.co/functions/v1/send-payment-confirmation`;
+      const { data: orderData } = await axios.post(orderUrl, { 
+        amount: 19900,
+        currency: "INR",
+        receipt: `receipt_${Date.now()}`
+      }, {
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Configure Razorpay options
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: orderData.amount.toString(),
+        currency: orderData.currency,
+        name: "MindSupremacy",
+        description: "Success Mastery Program",
+        image: "/logo.png",
+        order_id: orderData.id,
+        handler: function (response: any) {
+          verifyAndSavePayment(response, orderData);
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+        },
+        theme: {
+          color: "#B38D4D"
+        },
+        modal: {
+          ondismiss: function() {
+            setLoading(false);
+            toast.error("Payment cancelled");
+          }
+        }
+      };
+
+      // Initialize Razorpay
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
+    } catch (err: any) {
+      console.error("Payment initialization error:", err);
+      setError(err.message || "Failed to initialize payment");
+      toast.error(err.message || "Payment initialization failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBackToHome = () => {
     navigate("/");
@@ -430,6 +477,28 @@ export default function PaymentPage() {
           </p>
         </div>
       </footer>
+
+      {/* Add loading overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-secondary/90 p-8 rounded-xl border border-accent/20 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+            <p className="text-white">Processing payment...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Add error message */}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-500/90 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          <p className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {error}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

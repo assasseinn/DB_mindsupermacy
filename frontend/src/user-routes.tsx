@@ -11,12 +11,14 @@ const SignUp = lazy(() => import("./pages/SignUp.tsx"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.tsx"));
 const TermsOfUse = lazy(() => import("./pages/TermsOfUse.tsx"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy.tsx"));
+const PaymentHistory = lazy(() => import("./pages/PaymentHistory.tsx"));
 
 export const userRoutes: RouteObject[] = [
 	{ path: "/", element: <SuspenseWrapper><App /></SuspenseWrapper>},
 	{ path: "/login", element: <SuspenseWrapper><Login /></SuspenseWrapper>},
 	{ path: "/signup", element: <SuspenseWrapper><SignUp /></SuspenseWrapper>},
 	{ path: "/payment", element: <SuspenseWrapper><Payment /></SuspenseWrapper>},
+	{ path: "/payment-history", element: <SuspenseWrapper><PaymentHistory /></SuspenseWrapper>},
 	{ path: "/course", element: <SuspenseWrapper><Course /></SuspenseWrapper>},
 	{ path: "/privacy-policy", element: <SuspenseWrapper><PrivacyPolicy /></SuspenseWrapper>},
 	{ path: "/terms-of-use", element: <SuspenseWrapper><TermsOfUse /></SuspenseWrapper>},

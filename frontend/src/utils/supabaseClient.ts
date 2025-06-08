@@ -1,7 +1,5 @@
-// src/utils/supabaseClient.ts
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/**
+ * Re-export the single Supabase client instance from integrations.
+ * This ensures we only have one instance of the Supabase client throughout the application.
+ */
+export { supabase } from '@/integrations/supabase/client';
