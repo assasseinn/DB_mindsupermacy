@@ -39,23 +39,55 @@ export type Json =
          Row: {
            user_email: string;
            amount: number;
-           razorpay_payment_id: string;
-           razorpay_order_id: string;
+           cashfree_payment_id: string;
+           cashfree_order_id: string;
            status: string;
          };
          Insert: {
            user_email: string;
            amount: number;
-           razorpay_payment_id: string;
-           razorpay_order_id: string;
+           cashfree_payment_id: string;
+           cashfree_order_id: string;
            status: string;
          };
          Update: {
            user_email?: string;
            amount?: number;
-           razorpay_payment_id?: string;
-           razorpay_order_id?: string;
+           cashfree_payment_id?: string;
+           cashfree_order_id?: string;
            status?: string;
+         };
+       };
+       orders: {
+         Row: {
+           id: string;
+           cashfree_order_id: string;
+           amount: number;
+           currency: string;
+           status: string;
+           user_email: string;
+           customer_name: string;
+           created_at: string;
+         };
+         Insert: {
+           id?: string;
+           cashfree_order_id: string;
+           amount: number;
+           currency: string;
+           status: string;
+           user_email: string;
+           customer_name: string;
+           created_at?: string;
+         };
+         Update: {
+           id?: string;
+           cashfree_order_id?: string;
+           amount?: number;
+           currency?: string;
+           status?: string;
+           user_email?: string;
+           customer_name?: string;
+           created_at?: string;
          };
        }
      }

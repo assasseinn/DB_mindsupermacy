@@ -6,7 +6,8 @@ This project consists of a FastAPI backend server and a React + TypeScript front
 
 - User authentication and authorization
 - Course content delivery
-- Secure payment processing
+- Secure payment processing with Cashfree
+- Google Analytics tracking and conversion monitoring
 - Responsive design
 - Modern UI/UX
 
@@ -32,7 +33,8 @@ This project consists of a FastAPI backend server and a React + TypeScript front
 - Backend: FastAPI, Python
 - Database: Supabase
 - Authentication: Supabase Auth
-- Payment: Razorpay
+- Payment: Cashfree
+- Analytics: Google Analytics (G-CS7MYH9BF5)
 
 ## Stack
 

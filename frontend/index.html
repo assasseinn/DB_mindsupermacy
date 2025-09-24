@@ -12,6 +12,31 @@
 
   <title>Mindsupremacy</title>
 
+  <!-- Google Analytics -->
+  <script>
+    // Only load Google Analytics in production or when GA_TRACKING_ID is provided
+    const GA_TRACKING_ID = '%VITE_GA_TRACKING_ID%' || 'G-CS7MYH9BF5';
+    if (GA_TRACKING_ID && GA_TRACKING_ID !== '%VITE_GA_TRACKING_ID%') {
+      // Load gtag script
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
+      document.head.appendChild(script);
+      
+      // Initialize gtag
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', GA_TRACKING_ID, {
+        page_title: document.title,
+        page_location: window.location.href
+      });
+      
+      // Make gtag available globally
+      window.gtag = gtag;
+    }
+  </script>
+
   <load src="head.html" />
 </head>
 

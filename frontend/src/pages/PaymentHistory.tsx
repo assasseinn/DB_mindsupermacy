@@ -8,8 +8,8 @@ interface Payment {
   id: string;
   user_email: string;
   amount: number;
-  razorpay_payment_id: string;
-  razorpay_order_id: string;
+  cashfree_payment_id: string;
+  cashfree_order_id: string;
   status: string;
   created_at: string;
 }
@@ -111,7 +111,7 @@ export default function PaymentHistory() {
                         </span>
                       </div>
                       <p className="text-white/70 text-sm">
-                        Order ID: {payment.razorpay_order_id}
+                        Order ID: {payment.cashfree_order_id}
                       </p>
                     </div>
                     <div className="mt-4 md:mt-0 text-right">
@@ -119,7 +119,7 @@ export default function PaymentHistory() {
                         ₹{(payment.amount / 100).toFixed(2)}
                       </p>
                       <p className="text-white/50 text-sm">
-                        Payment ID: {payment.razorpay_payment_id}
+                        Payment ID: {payment.cashfree_payment_id}
                       </p>
                     </div>
                   </div>

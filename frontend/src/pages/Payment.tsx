@@ -7,6 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/extensions/shadcn/components/separator";
 import { toast } from "react-hot-toast";
+import { load } from "cashfree-pg-sdk-javascript";
+import { 
+  trackBeginCheckout, 
+  trackPurchase, 
+  trackPaymentError, 
+  trackFormSubmit,
+  trackCTAClick 
+} from "@/utils/analytics";
 
 const paymentMethods = [
   { id: "card", name: "Credit/Debit Card", icon: "💳" },
@@ -43,19 +51,19 @@ export default function PaymentPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Verify payment with backend and save to Supabase
+  // Verify payment with Cashfree and save to Supabase
   const verifyAndSavePayment = async (response: any, orderData: any) => {
     try {
       setPaymentStatus('processing');
       setError(null);
 
-      // 1. Verify payment with backend
-      const verifyUrl = `https://kvfngdrucqptgfjqxpyp.supabase.co/functions/v1/payment/verify`;
+      // Verify payment with Supabase function
+      const verifyUrl = `https://kvfngdrucqptgfjqxpyp.supabase.co/functions/v1/send-payment-confirmation/verify`;
       const { data: verifyResult } = await axios.post(verifyUrl, {
         ...response,
-        order_id: orderData.id,
+        order_id: orderData.order_id,
         user_email: formData.email,
-        amount: orderData.amount,
+        amount: orderData.order_amount,
       }, {
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
@@ -64,57 +72,74 @@ export default function PaymentPage() {
       });
 
       if (!verifyResult.success) {
+        trackPaymentError('verification_failed', 'Payment verification failed');
         throw new Error("Payment verification failed");
       }
 
-      // 2. Save payment info to Supabase
+      // Save payment info to Supabase
       const { error: dbError } = await supabase.from("payments").insert([
         {
           user_email: formData.email,
-          amount: orderData.amount,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_order_id: response.razorpay_order_id,
+          amount: orderData.order_amount,
+          cashfree_payment_id: response.paymentDetails?.paymentId || response.transactionId,
+          cashfree_order_id: orderData.order_id,
           status: "success",
         },
       ]);
 
       if (dbError) {
+        trackPaymentError('database_error', 'Failed to save payment record');
         throw new Error("Failed to save payment record");
       }
 
-      // 3. Send confirmation email
+      // Send confirmation email
       await supabase.functions.invoke('send-payment-confirmation', {
         body: { 
           email: formData.email,
-          amount: orderData.amount,
-          orderId: orderData.id
+          amount: orderData.order_amount,
+          orderId: orderData.order_id
         }
       });
+
+      // Track successful purchase in Google Analytics
+      trackPurchase(
+        orderData.order_id,
+        orderData.order_amount / 100, // Convert paise to rupees for GA
+        'INR'
+      );
 
       setPaymentStatus('success');
       toast.success('Payment successful! Redirecting to course...');
       
-      // 4. Navigate to course after a short delay
+      // Navigate to course after a short delay
       setTimeout(() => {
         navigate("/course");
       }, 2000);
 
     } catch (err: any) {
       console.error("Payment error:", err);
+      trackPaymentError('payment_processing', err.message || "An error occurred during payment");
       setPaymentStatus('error');
       setError(err.message || "An error occurred during payment");
       toast.error(err.message || "Payment failed. Please try again.");
     }
   };
 
-  const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
+  const initializeCashfree = async () => {
+    try {
+      // Get environment from environment variable
+      const environment = import.meta.env.VITE_CASHFREE_ENVIRONMENT || 'sandbox';
+      
+      const cashfree = await load({
+        mode: environment as 'sandbox' | 'production',
+      });
+      
+      console.log(`Cashfree SDK loaded in ${environment} mode`);
+      return cashfree;
+    } catch (error) {
+      console.error("Failed to load Cashfree SDK:", error);
+      throw new Error("Failed to load payment gateway");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,61 +147,103 @@ export default function PaymentPage() {
     setLoading(true);
     setError(null);
 
-    try {
-      // Load Razorpay script
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        throw new Error("Failed to load payment gateway");
-      }
+    // Track form submission attempt
+    trackFormSubmit('payment_form', true);
 
-      // Create order
+    // Validate form
+    if (!formData.name || !formData.email) {
+      setError("Please fill in all required fields");
+      trackFormSubmit('payment_form', false);
+      setLoading(false);
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      trackFormSubmit('payment_form', false);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      console.log('Initializing payment process...');
+      
+      // Track begin checkout
+      trackBeginCheckout(199, 'INR');
+      
+      // Initialize Cashfree
+      const cashfree = await initializeCashfree();
+
+      // Create order with Supabase function
       const orderUrl = `https://kvfngdrucqptgfjqxpyp.supabase.co/functions/v1/send-payment-confirmation`;
       const { data: orderData } = await axios.post(orderUrl, { 
-        amount: 19900,
+        amount: 19900, // ₹199 in paise
         currency: "INR",
-        receipt: `receipt_${Date.now()}`
+        customer_details: {
+          customer_id: `customer_${Date.now()}`,
+          customer_name: formData.name,
+          customer_email: formData.email,
+          customer_phone: "9999999999" // You might want to add phone field
+        }
       }, {
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 30000 // 30 second timeout
       });
 
-      // Configure Razorpay options
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: orderData.amount.toString(),
-        currency: orderData.currency,
-        name: "MindSupremacy",
-        description: "Success Mastery Program",
-        image: "/logo.png",
-        order_id: orderData.id,
-        handler: function (response: any) {
-          verifyAndSavePayment(response, orderData);
-        },
-        prefill: {
-          name: formData.name,
-          email: formData.email,
-        },
-        theme: {
-          color: "#B38D4D"
-        },
-        modal: {
-          ondismiss: function() {
-            setLoading(false);
-            toast.error("Payment cancelled");
-          }
-        }
+      if (!orderData.payment_session_id) {
+        trackPaymentError('order_creation', 'Invalid response from payment service');
+        throw new Error('Invalid response from payment service');
+      }
+
+      console.log('Order created successfully, opening checkout...');
+
+      // Configure Cashfree checkout options
+      const checkoutOptions = {
+        paymentSessionId: orderData.payment_session_id,
+        redirectTarget: "_self", // "_self" for same window, "_blank" for new tab
       };
 
-      // Initialize Razorpay
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
+      // Open Cashfree checkout
+      const result = await cashfree.checkout(checkoutOptions);
+      
+      if (result.error) {
+        console.error("Payment failed:", result.error);
+        trackPaymentError('checkout_failed', result.error.message || "Payment failed");
+        throw new Error(result.error.message || "Payment failed");
+      }
+
+      if (result.redirect) {
+        console.log("Payment completed, redirecting...");
+        // Handle successful payment
+        await verifyAndSavePayment(result, orderData);
+      }
 
     } catch (err: any) {
       console.error("Payment initialization error:", err);
-      setError(err.message || "Failed to initialize payment");
-      toast.error(err.message || "Payment initialization failed");
+      
+      // Provide user-friendly error messages
+      let errorMessage = "Payment initialization failed";
+      if (err.code === 'NETWORK_ERROR') {
+        errorMessage = "Network error. Please check your connection and try again.";
+        trackPaymentError('network_error', errorMessage);
+      } else if (err.response?.status === 401) {
+        errorMessage = "Authentication failed. Please try again.";
+        trackPaymentError('auth_error', errorMessage);
+      } else if (err.response?.status >= 500) {
+        errorMessage = "Service temporarily unavailable. Please try again later.";
+        trackPaymentError('server_error', errorMessage);
+      } else if (err.message) {
+        errorMessage = err.message;
+        trackPaymentError('general_error', errorMessage);
+      }
+      
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -382,6 +449,7 @@ export default function PaymentPage() {
                 <div className="pt-4">
                   <button 
                     type="submit"
+                    onClick={() => trackCTAClick('complete_payment', 'payment_page')}
                     className="w-full py-4 px-6 bg-accent hover:bg-accent/90 text-white rounded-lg font-semibold text-lg uppercase tracking-wider transition-all duration-300 hover:shadow-[0_0_20px_rgba(179,141,77,0.5)] overflow-hidden group relative"
                   >
                     {/* Shine effect */}
@@ -392,7 +460,7 @@ export default function PaymentPage() {
                       style={{ zIndex: 5 }}
                     />
                     <span className="relative z-10 flex items-center justify-center">
-                      Complete Purchase
+                      Complete Payment
                       <svg 
                         className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" 
                         fill="none" 

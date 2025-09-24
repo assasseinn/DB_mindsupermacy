@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
+import { trackLogin, trackFormSubmit } from "@/utils/analytics";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,11 +15,17 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    
+    trackFormSubmit('login_form', true);
+    
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
+    
     if (error) {
       setError(error.message);
+      trackFormSubmit('login_form', false);
     } else {
+      trackLogin('email');
       navigate("/payment");
     }
   };
