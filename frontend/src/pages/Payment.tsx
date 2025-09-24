@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/extensions/shadcn/components/separator";
 import { toast } from "react-hot-toast";
-import { load } from "cashfree-pg-sdk-javascript";
+import { load } from '@cashfreepayments/cashfree-js';
 import { 
   trackBeginCheckout, 
   trackPurchase, 
@@ -45,6 +45,8 @@ export default function PaymentPage() {
     expiryDate: "",
     cvv: "",
   });
+  const shouldPersistMockPayments =
+    import.meta.env.VITE_SAVE_MOCK_PAYMENTS === "true";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -58,7 +60,7 @@ export default function PaymentPage() {
       setError(null);
 
       // Verify payment with Supabase function
-      const verifyUrl = `https://kvfngdrucqptgfjqxpyp.supabase.co/functions/v1/send-payment-confirmation/verify`;
+      const verifyUrl = `https://ibbukhlelbpgxedoqrni.supabase.co/functions/v1/send-payment-confirmation/verify`;
       const { data: verifyResult } = await axios.post(verifyUrl, {
         ...response,
         order_id: orderData.order_id,
@@ -130,9 +132,14 @@ export default function PaymentPage() {
       // Get environment from environment variable
       const environment = import.meta.env.VITE_CASHFREE_ENVIRONMENT || 'sandbox';
       
+      // Load the Cashfree SDK
       const cashfree = await load({
         mode: environment as 'sandbox' | 'production',
       });
+      
+      if (!cashfree) {
+        throw new Error('Cashfree SDK failed to load');
+      }
       
       console.log(`Cashfree SDK loaded in ${environment} mode`);
       return cashfree;
@@ -176,24 +183,41 @@ export default function PaymentPage() {
       // Initialize Cashfree
       const cashfree = await initializeCashfree();
 
-      // Create order with Supabase function
-      const orderUrl = `https://kvfngdrucqptgfjqxpyp.supabase.co/functions/v1/send-payment-confirmation`;
-      const { data: orderData } = await axios.post(orderUrl, { 
-        amount: 19900, // ₹199 in paise
-        currency: "INR",
-        customer_details: {
-          customer_id: `customer_${Date.now()}`,
-          customer_name: formData.name,
-          customer_email: formData.email,
-          customer_phone: "9999999999" // You might want to add phone field
-        }
-      }, {
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000 // 30 second timeout
-      });
+      // For development: Create a mock order response
+      // TODO: Replace with actual Supabase function call after deployment
+      const isDevelopment = window.location.hostname === 'localhost';
+      let orderData;
+      
+      if (isDevelopment) {
+        // Mock order data for development
+        orderData = {
+          order_id: `order_${Date.now()}_dev`,
+          order_amount: 19900,
+          currency: 'INR',
+          payment_session_id: `session_test_${Date.now()}`
+        };
+        console.log('Using mock order data for development:', orderData);
+      } else {
+        // Create order with Supabase function (production)
+        const orderUrl = `https://ibbukhlelbpgxedoqrni.supabase.co/functions/v1/send-payment-confirmation`;
+        const { data: orderResponse } = await axios.post(orderUrl, { 
+          amount: 19900, // ₹199 in paise
+          currency: "INR",
+          customer_details: {
+            customer_id: `customer_${Date.now()}`,
+            customer_name: formData.name,
+            customer_email: formData.email,
+            customer_phone: "9999999999" // You might want to add phone field
+          }
+        }, {
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          timeout: 30000 // 30 second timeout
+        });
+        orderData = orderResponse;
+      }
 
       if (!orderData.payment_session_id) {
         trackPaymentError('order_creation', 'Invalid response from payment service');
@@ -202,14 +226,79 @@ export default function PaymentPage() {
 
       console.log('Order created successfully, opening checkout...');
 
-      // Configure Cashfree checkout options
-      const checkoutOptions = {
+      // Configure Cashfree payment options
+      const paymentOptions = {
         paymentSessionId: orderData.payment_session_id,
-        redirectTarget: "_self", // "_self" for same window, "_blank" for new tab
+        returnUrl: `${window.location.origin}/payment?status=success`,
       };
 
-      // Open Cashfree checkout
-      const result = await cashfree.checkout(checkoutOptions);
+      if (isDevelopment) {
+        // Mock successful payment for development
+        console.log('Development mode: Simulating successful payment');
+        toast.success('Payment successful! (Development Mode)');
+        
+        if (shouldPersistMockPayments) {
+          // Optionally write mock data for local Supabase setups
+          try {
+            const { error: orderError } = await supabase.from("orders").upsert(
+              [
+                {
+                  cashfree_order_id: orderData.order_id,
+                  amount: orderData.order_amount,
+                  currency: orderData.currency,
+                  status: "completed",
+                  user_email: formData.email,
+                  customer_name: formData.name,
+                },
+              ],
+              { onConflict: "cashfree_order_id" }
+            );
+
+            if (orderError) {
+              console.warn('Failed to upsert mock order:', orderError);
+            }
+
+            const { data: paymentData, error: dbError } = await supabase.from("payments").insert([
+              {
+                user_email: formData.email,
+                amount: orderData.order_amount,
+                cashfree_payment_id: `mock_payment_${Date.now()}`,
+                cashfree_order_id: orderData.order_id,
+                status: "success",
+              },
+            ]);
+
+            if (dbError) {
+              console.warn('Failed to save mock payment:', dbError);
+            } else {
+              console.log('Mock payment saved successfully:', paymentData);
+            }
+          } catch (error) {
+            console.warn('Exception saving mock payment:', error);
+          }
+        } else {
+          console.log('Skipping Supabase persistence in development. Set VITE_SAVE_MOCK_PAYMENTS=true to enable.');
+        }
+
+        // Track successful purchase in Google Analytics
+        trackPurchase(
+          orderData.order_id,
+          orderData.order_amount / 100,
+          'INR'
+        );
+
+        setPaymentStatus('success');
+        
+        // Navigate to course after a short delay
+        setTimeout(() => {
+          navigate("/course");
+        }, 2000);
+        
+        return;
+      }
+
+      // Open Cashfree checkout (production)
+      const result = await cashfree.pay(paymentOptions);
       
       if (result.error) {
         console.error("Payment failed:", result.error);

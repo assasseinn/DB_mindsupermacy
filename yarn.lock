@@ -197,6 +197,11 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
+"@cashfreepayments/cashfree-js@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.npmjs.org/@cashfreepayments/cashfree-js/-/cashfree-js-1.0.5.tgz"
+  integrity sha512-fP9wi9mseXJmESGIkD9vb6RAKdSZw42jXiQY2LUt5A2STyEqMv0mYLgK2zqpMNSbdK9QdN1c4YnEv9mmyxC8mg==
+
 "@chakra-ui/accordion@2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@chakra-ui/accordion/-/accordion-2.3.1.tgz"
@@ -2418,11 +2423,6 @@ caniuse-lite@^1.0.30001702, caniuse-lite@^1.0.30001716:
   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001718.tgz"
   integrity sha512-AflseV1ahcSunK53NfEs9gFWgOEmzr0f+kaMFA4xiLZlr9Hzt7HxcSpIFcnNCUkz6R6dWKa54rUz3HUmI3nVcw==
 
-cashfree-pg-sdk-javascript@^2.0.8:
-  version "2.0.8"
-  resolved "https://registry.npmjs.org/cashfree-pg-sdk-javascript/-/cashfree-pg-sdk-javascript-2.0.8.tgz"
-  integrity sha512-e/2A07W9dKLdqYGVZX57KQqjdu8PjOKVWiAJjSASacdi5Ok+rib2KVLm1fU0mJikviGBj02AWe72W2ueZ3BpNw==
-
 chalk@^4.0.0:
   version "4.1.2"
   resolved "https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz"
@@ -3852,6 +3852,7 @@ mime-types@^2.1.12:
   dependencies:
     "@11labs/react" "0.0.4"
     "@auth0/auth0-react" "2.3.0"
+    "@cashfreepayments/cashfree-js" "^1.0.5"
     "@chakra-ui/react" "2.8.2"
     "@emotion/react" "11.11.3"
     "@emotion/styled" "11.11.0"
@@ -3867,7 +3868,7 @@ mime-types@^2.1.12:
     "@tanstack/react-query" "5.61.4"
     "@tiptap/react" "2.4.0"
     "@tiptap/starter-kit" "2.4.0"
-    axios "^1.9.0"
+    axios "^1.12.2"
     class-variance-authority "^0.7.0"
     clsx "^2.1.1"
     date-fns "^3.6.0"

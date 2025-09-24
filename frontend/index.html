@@ -15,8 +15,8 @@
   <!-- Google Analytics -->
   <script>
     // Only load Google Analytics in production or when GA_TRACKING_ID is provided
-    const GA_TRACKING_ID = '%VITE_GA_TRACKING_ID%' || 'G-CS7MYH9BF5';
-    if (GA_TRACKING_ID && GA_TRACKING_ID !== '%VITE_GA_TRACKING_ID%') {
+    const GA_TRACKING_ID = '%VITE_GA_TRACKING_ID%';
+    if (GA_TRACKING_ID && GA_TRACKING_ID !== '%VITE_GA_TRACKING_ID%' && GA_TRACKING_ID !== 'undefined') {
       // Load gtag script
       const script = document.createElement('script');
       script.async = true;
@@ -34,6 +34,25 @@
       
       // Make gtag available globally
       window.gtag = gtag;
+      console.log('Google Analytics loaded with ID:', GA_TRACKING_ID);
+    } else {
+      // Development fallback - load with the direct ID
+      const fallbackGA = 'G-CS7MYH9BF5';
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${fallbackGA}`;
+      document.head.appendChild(script);
+      
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', fallbackGA, {
+        page_title: document.title,
+        page_location: window.location.href
+      });
+      
+      window.gtag = gtag;
+      console.log('Google Analytics loaded with fallback ID:', fallbackGA);
     }
   </script>
 
