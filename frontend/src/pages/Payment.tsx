@@ -270,6 +270,30 @@ export default function PaymentPage() {
 
             if (dbError) {
               console.warn('Failed to save mock payment:', dbError);
+              console.log('Payment data attempted:', {
+                user_email: formData.email,
+                amount: orderData.order_amount,
+                cashfree_payment_id: `mock_payment_${Date.now()}`,
+                cashfree_order_id: orderData.order_id,
+                status: "success",
+              });
+              
+              // Try without the problematic column
+              console.log('Attempting to save without cashfree_order_id...');
+              const { data: paymentData2, error: dbError2 } = await supabase.from("payments").insert([
+                {
+                  user_email: formData.email,
+                  amount: orderData.order_amount,
+                  cashfree_payment_id: `mock_payment_fallback_${Date.now()}`,
+                  status: "success",
+                },
+              ]);
+              
+              if (dbError2) {
+                console.error('Fallback payment insertion also failed:', dbError2);
+              } else {
+                console.log('✅ Fallback payment saved successfully:', paymentData2);
+              }
             } else {
               console.log('Mock payment saved successfully:', paymentData);
             }
