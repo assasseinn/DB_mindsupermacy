@@ -1,66 +1,90 @@
-import React, { startTransition, useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { supabase } from "../utils/supabaseClient";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo-mindsupremacy.png"; // Place the provided logo image as this file
 
 const navLinks = [
-  { path: "/", label: "Home" },
-  { path: "/course", label: "Course" },
-  { path: "/payment", label: "Payment" },
+  { label: "About", to: "/#about" },
+  { label: "Reviews", to: "/#reviews" },
+  { label: "Course", to: "/course" },
+  { label: "FAQs", to: "/#faqs" },
 ];
 
 export default function Header() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
-    };
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <header className="w-full bg-secondary/80 backdrop-blur-md shadow-md border-b border-accent/20 sticky top-0 z-30">
-      <div className="container mx-auto flex items-center justify-between py-3 px-6">
-        <span className="flex items-center space-x-3 cursor-pointer" onClick={() => startTransition(() => navigate("/"))}>
-          <img src={logo} alt="Mindsupremacy Logo" className="h-10 w-10 rounded-full border border-accent/40 bg-white/80" />
-          <span className="font-bold text-xl text-accent tracking-wide">Mindsupremacy</span>
-        </span>
-        <nav className="flex items-center space-x-6">
-          {navLinks.map(link => (
-            <span
-              key={link.path}
-              onClick={() => startTransition(() => navigate(link.path))}
-              className={`text-white/80 hover:text-accent transition-colors px-2 py-1 rounded-md font-medium cursor-pointer ${location.pathname === link.path ? 'text-accent bg-accent/10' : ''}`}
-            >
-              {link.label}
-            </span>
-          ))}
-          {isLoggedIn && (
-            <span
-              onClick={() => startTransition(() => navigate("/payment-history"))}
-              className={`text-white/80 hover:text-accent transition-colors px-2 py-1 rounded-md font-medium cursor-pointer ${location.pathname === "/payment-history" ? 'text-accent bg-accent/10' : ''}`}
-            >
-              Payment History
-            </span>
-          )}
-          <span
-            onClick={() => startTransition(() => navigate(isLoggedIn ? "/course" : "/login"))}
-            className="text-white/80 hover:text-accent transition-colors px-2 py-1 rounded-md font-medium cursor-pointer"
-          >
-            {isLoggedIn ? "Dashboard" : "Login"}
-          </span>
+      <div className="container mx-auto flex items-center justify-between py-3 px-4 md:px-6">
+        <Link to="/" className="flex items-center space-x-2 md:space-x-3 cursor-pointer">
+          <img src={logo} alt="Mindsupremacy Logo" className="h-8 w-8 md:h-10 md:w-10 rounded-full border border-accent/40 bg-white/80" />
+          <span className="font-bold text-lg md:text-xl text-accent tracking-wide">Mindsupremacy</span>
+        </Link>
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          {navLinks.map(link => {
+            const isHashLink = link.to.includes("#");
+            const targetHash = isHashLink ? `#${link.to.split("#")[1]}` : "";
+            const isActive = isHashLink
+              ? location.hash === targetHash
+              : location.pathname === link.to;
+
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`text-white/80 hover:text-accent transition-colors px-2 py-1 rounded-md font-medium ${isActive ? "text-accent bg-accent/10" : ""}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
+        
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden flex items-center justify-center w-8 h-8 text-white/80 hover:text-accent transition-colors"
+          aria-label="Toggle mobile menu"
+        >
+          {isMobileMenuOpen ? (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
       </div>
+      
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-secondary/95 backdrop-blur-md border-t border-accent/20">
+          <nav className="container mx-auto px-4 py-4 space-y-2">
+            {navLinks.map(link => {
+              const isHashLink = link.to.includes("#");
+              const targetHash = isHashLink ? `#${link.to.split("#")[1]}` : "";
+              const isActive = isHashLink
+                ? location.hash === targetHash
+                : location.pathname === link.to;
+
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block text-white/80 hover:text-accent transition-colors px-3 py-2 rounded-md font-medium ${isActive ? 'text-accent bg-accent/10' : 'hover:bg-secondary/20'}`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

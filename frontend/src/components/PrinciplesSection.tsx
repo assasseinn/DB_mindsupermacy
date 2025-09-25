@@ -58,7 +58,7 @@ const PrincipleCard = ({ principle }: PrincipleCardProps) => {
 export function PrinciplesSection() {
 
   return (
-    <section className="w-full py-16 md:py-24 px-4 relative overflow-hidden">
+    <section className="w-full py-12 md:py-24 px-4 relative overflow-hidden">
       {/* Sacred geometry subtle background element */}
       <div className="absolute top-0 left-0 w-full h-full opacity-5">
         <div className="w-[1000px] h-[1000px] rounded-full border border-accent absolute -top-500 -right-500 transform rotate-45"></div>
@@ -66,7 +66,7 @@ export function PrinciplesSection() {
       </div>
 
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-white">
             Master These 7 Forbidden Principles
           </h2>

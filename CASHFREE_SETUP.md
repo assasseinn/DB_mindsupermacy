@@ -111,12 +111,10 @@ For UPI testing in sandbox:
 3. **Payment Verification**: Verifies payments with Cashfree API
 4. **Database Integration**: Stores order and payment data in Supabase
 5. **Email Notifications**: Sends confirmation emails after successful payments
-6. **Payment History**: Displays payment history to users
 
 ## Files Modified
 
 - `frontend/src/pages/Payment.tsx` - Main payment page with Cashfree integration
-- `frontend/src/pages/PaymentHistory.tsx` - Payment history display
 - `supabase/functions/send-payment-confirmation/index.ts` - Backend payment processing
 - `frontend/src/integrations/supabase/types.ts` - Database type definitions
 
