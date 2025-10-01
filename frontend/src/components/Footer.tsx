@@ -9,6 +9,9 @@ export default function Footer() {
           <span className="font-bold text-lg text-accent">MindSupremacy</span> &copy; {new Date().getFullYear()} All rights reserved.
         </div>
         <nav className="flex flex-wrap gap-4 text-sm justify-center md:justify-end">
+          <Link to="/about" className="hover:text-accent transition-colors">About</Link>
+          <Link to="/contact" className="hover:text-accent transition-colors">Contact</Link>
+          <Link to="/faqs" className="hover:text-accent transition-colors">FAQs</Link>
           <Link to="/privacy-policy" className="hover:text-accent transition-colors">Privacy Policy</Link>
           <Link to="/terms-of-use" className="hover:text-accent transition-colors">Terms of Use</Link>
           <Link to="/refund-policy" className="hover:text-accent transition-colors">Refund Policy</Link>

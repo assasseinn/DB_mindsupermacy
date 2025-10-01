@@ -302,23 +302,6 @@ export default function CoursePage() {
                       <p className="text-white/60 text-xs md:text-sm">Chapter {currentIndex + 1} of {chapters.length}</p>
                     </div>
                   </div>
-                  <div className="p-4 md:p-6 space-y-3 md:space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/70 text-sm">Audio Length:</span>
-                      <span className="text-white font-medium text-sm">{currentChapter.audioLength}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-white/70 text-sm">Starts at:</span>
-                      <span className="text-white font-medium text-sm">{currentChapter.timestamp}</span>
-                    </div>
-                    <button className="w-full py-2 md:py-3 px-3 md:px-4 bg-accent/10 hover:bg-accent/20 text-accent border border-accent/30 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 mt-2 group text-sm md:text-base">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="font-medium">Play Audio Sample</span>
-                    </button>
-                  </div>
                 </div>
                 
                 {/* Journey Map */}

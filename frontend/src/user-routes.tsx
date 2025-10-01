@@ -8,6 +8,9 @@ const Payment = lazy(() => import("./pages/PaymentProtected.tsx"));
 const Course = lazy(() => import("./pages/CourseProtected.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
 const SignUp = lazy(() => import("./pages/SignUp.tsx"));
+const About = lazy(() => import("./pages/About.tsx"));
+const Contact = lazy(() => import("./pages/Contact.tsx"));
+const Faqs = lazy(() => import("./pages/Faqs.tsx"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.tsx"));
 const TermsOfUse = lazy(() => import("./pages/TermsOfUse.tsx"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy.tsx"));
@@ -16,6 +19,9 @@ export const userRoutes: RouteObject[] = [
 	{ index: true, element: <SuspenseWrapper><App /></SuspenseWrapper>},
 	{ path: "login", element: <SuspenseWrapper><Login /></SuspenseWrapper>},
 	{ path: "signup", element: <SuspenseWrapper><SignUp /></SuspenseWrapper>},
+	{ path: "about", element: <SuspenseWrapper><About /></SuspenseWrapper>},
+	{ path: "contact", element: <SuspenseWrapper><Contact /></SuspenseWrapper>},
+	{ path: "faqs", element: <SuspenseWrapper><Faqs /></SuspenseWrapper>},
 	{ path: "payment", element: <SuspenseWrapper><Payment /></SuspenseWrapper>},
 	{ path: "course", element: <SuspenseWrapper><Course /></SuspenseWrapper>},
 	{ path: "privacy-policy", element: <SuspenseWrapper><PrivacyPolicy /></SuspenseWrapper>},
