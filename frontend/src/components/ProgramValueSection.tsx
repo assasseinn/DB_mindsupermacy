@@ -109,21 +109,16 @@ export function ProgramValueSection() {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-accent/10 rounded-full"></div>
             </div>
             
-            {/* Limited time offer badge */}
-            <div className="absolute -top-4 -right-4 bg-accent text-white text-xs font-bold px-8 py-1 transform rotate-45 shadow-lg">
-              LIMITED TIME
-            </div>
-            
             <div className="text-center mb-6 relative z-10">
               <h3 className="text-3xl font-bold text-white mb-2">Unlock Your Potential Today</h3>
               <p className="text-white/70">Complete program with all bonuses</p>
             </div>
             
             <div className="flex justify-center items-center mb-8 relative z-10">
-              <div className="text-xl text-white/50 line-through mr-4">₹1000</div>
-              <div className="text-5xl font-extrabold text-white">₹199</div>
+              <div className="text-xl text-white/50 line-through mr-4">₹1200</div>
+              <div className="text-5xl font-extrabold text-white">₹299</div>
               <div className="ml-4 bg-accent/30 text-accent px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                Save ₹801
+                Save ₹901
               </div>
             </div>
             

@@ -178,7 +178,7 @@ export default function PaymentPage() {
       console.log('Initializing payment process...');
       
       // Track begin checkout
-      trackBeginCheckout(199, 'INR');
+      trackBeginCheckout(299, 'INR');
       
       // Initialize Cashfree
       const cashfree = await initializeCashfree();
@@ -192,7 +192,7 @@ export default function PaymentPage() {
         // Mock order data for development
         orderData = {
           order_id: `order_${Date.now()}_dev`,
-          order_amount: 19900,
+          order_amount: 29900,
           currency: 'INR',
           payment_session_id: `session_test_${Date.now()}`
         };
@@ -201,7 +201,7 @@ export default function PaymentPage() {
         // Create order with Supabase function (production)
         const orderUrl = `https://ibbukhlelbpgxedoqrni.supabase.co/functions/v1/send-payment-confirmation`;
         const { data: orderResponse } = await axios.post(orderUrl, { 
-          amount: 19900, // ₹199 in paise
+          amount: 29900, // ₹299 in paise
           currency: "INR",
           customer_details: {
             customer_id: `customer_${Date.now()}`,
@@ -455,15 +455,15 @@ export default function PaymentPage() {
               <div className="mt-8 pt-6 border-t border-white/10">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white/70">Original Price:</span>
-                  <span className="text-white/50 line-through">₹1000</span>
+                  <span className="text-white/50 line-through">₹1200</span>
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white/70">Discount:</span>
-                  <span className="text-accent">-₹801</span>
+                  <span className="text-accent">-₹901</span>
                 </div>
                 <div className="flex items-center justify-between text-xl font-bold">
                   <span className="text-white">Today's Price:</span>
-                  <span className="text-white">₹199</span>
+                  <span className="text-white">₹299</span>
                 </div>
               </div>
               

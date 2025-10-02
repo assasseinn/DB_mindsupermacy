@@ -414,7 +414,7 @@ export default function CoursePage() {
               <div className="bg-secondary/10 rounded-lg border border-secondary/20 p-4 md:p-6">
                 <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white">What if it doesn't work for me?</h3>
                 <p className="text-white/80 text-sm md:text-base leading-relaxed">
-                  The principles work universally when properly applied, but individual implementation can vary. That's why we offer a 60-day "Soul Guarantee" – if you don't experience measurable improvement after sincerely implementing these principles for 60 days, we'll refund your investment completely. We can make this guarantee confidently because the historical success rate exceeds 90% among those who follow the implementation steps.
+                  The principles work universally when properly applied, but individual implementation can vary. That's why we offer a 15-day "Soul Guarantee" – if you don't experience measurable improvement after sincerely implementing these principles for 15 days, we'll refund your investment completely. We can make this guarantee confidently because the historical success rate exceeds 90% among those who follow the implementation steps.
                 </p>
               </div>
             </div>
