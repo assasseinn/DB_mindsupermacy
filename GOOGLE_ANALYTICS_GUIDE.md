@@ -89,7 +89,7 @@ trackScrollDepth(page: string, percentage: number)
 1. **Purchase Goal**
    - Type: Destination
    - URL: `/course` (after successful payment)
-   - Value: ₹199
+   - Value: ₹299
 
 2. **Begin Checkout Goal**
    - Type: Event
@@ -109,7 +109,7 @@ trackScrollDepth(page: string, percentage: number)
   item_id: 'success_mastery_program',
   item_name: 'Success Mastery Program',
   item_category: 'Course',
-  price: 199,
+  price: 299,
   quantity: 1,
   currency: 'INR'
 }
@@ -131,10 +131,10 @@ trackScrollDepth(page: string, percentage: number)
 trackCTAClick('complete_payment', 'payment_page');
 
 // When checkout begins
-trackBeginCheckout(199, 'INR');
+trackBeginCheckout(299, 'INR');
 
 // On successful payment
-trackPurchase('order_12345', 199, 'INR');
+trackPurchase('order_12345', 299, 'INR');
 
 // On payment error
 trackPaymentError('network_error', 'Connection timeout');
@@ -160,7 +160,7 @@ trackSignUp('email');
 - **Conversion Rate**: Visitors to Payment Success
 - **Cart Abandonment**: Begin Checkout without Purchase
 - **Payment Success Rate**: Successful vs Failed Payments
-- **Average Order Value**: ₹199 (fixed for single product)
+- **Average Order Value**: ₹299 (fixed for single product)
 
 ### Engagement Metrics
 - **Page Views per Session**

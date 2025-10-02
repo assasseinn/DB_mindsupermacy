@@ -37,6 +37,10 @@ CASHFREE_WEBHOOK_SECRET=your_webhook_secret_key
 FRONTEND_URL=https://yourdomain.com
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Email provider (Resend)
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM="MindSupremacy <no-reply@yourdomain.com>"
 ```
 
 ### Frontend Environment Variables (.env.production)
@@ -124,7 +128,7 @@ curl -X POST https://your-project.supabase.co/functions/v1/send-payment-confirma
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ANON_KEY" \
   -d '{
-    "amount": 19900,
+    "amount": 29900,
     "currency": "INR",
     "customer_details": {
       "customer_id": "test_customer",

@@ -84,14 +84,6 @@ export function TrustElementsSection() {
                 transition={{ repeat: Infinity, duration: 2.5, repeatDelay: 2 }}
               />
               
-              {/* Seal/badge */}
-              <div className="absolute -right-5 -top-5 w-24 h-24 rounded-full bg-accent/20 backdrop-blur-md flex items-center justify-center transform rotate-12 border-2 border-accent">
-                <div className="text-white font-bold text-sm text-center transform -rotate-12">
-                  <span className="block">SOUL</span>
-                  <span className="block">GUARANTEE</span>
-                </div>
-              </div>
-              
               <div className="flex flex-col md:flex-row items-center mb-4">
                 <div className="mr-4 text-accent">
                   <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
@@ -99,9 +91,9 @@ export function TrustElementsSection() {
                   </svg>
                 </div>
                 <div className="text-center md:text-left">
-                  <h3 className="text-2xl font-bold text-white mb-1">60-Day Money-Back <span className="text-accent">"Soul"</span> Guarantee</h3>
+                  <h3 className="text-2xl font-bold text-white mb-1">15-Day Money-Back <span className="text-accent">"Soul"</span> Guarantee</h3>
                   <p className="text-white/80 max-w-2xl">
-                    If these principles don't create a profound shift in your mindset and results within 60 days, simply request a full refund. We stand behind this wisdom with absolute confidence.
+                    If these principles don't create a profound shift in your mindset and results within 15 days, simply request a full refund. We stand behind this wisdom with absolute confidence.
                   </p>
                 </div>
               </div>
@@ -150,7 +142,7 @@ const trustElements = [
       </svg>
     ),
     title: "Money Back Guarantee",
-    description: "Try the complete program risk-free with our 60-day guarantee. If you're not satisfied, simply request a full refund—no questions asked."
+    description: "Try the complete program risk-free with our 15-day guarantee. If you're not satisfied, simply request a full refund—no questions asked."
   },
   {
     icon: (

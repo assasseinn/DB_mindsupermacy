@@ -20,12 +20,6 @@ export function HeroSection({
       {/* Background with sacred geometry and neural network visualization */}
       <SacredGeometryBackground />
 
-      {/* Floating discount badge */}
-      <div className="absolute top-4 right-4 md:top-6 md:right-6 lg:top-10 lg:right-10 bg-gradient-to-r from-accent-600/80 to-accent-800/80 backdrop-blur-sm rounded-full px-3 py-2 md:px-4 md:py-2 lg:px-6 lg:py-3 text-white font-montserrat font-bold shadow-lg transform rotate-3 z-20 w-max">
-        <span className="block text-xs md:text-sm tracking-wide">LIMITED TIME</span>
-        <span className="block text-sm md:text-lg lg:text-xl">91% OFF</span>
-      </div>
-      
       <div className="container mx-auto px-4 relative z-10 text-center flex flex-col items-center">
         <motion.img
           src="/Mandala.png"

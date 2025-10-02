@@ -176,6 +176,25 @@ serve(async (req) => {
       
       log('info', 'Verifying payment', { order_id, user_email });
       
+      // Check existing order status for idempotency
+      const { data: existingOrder, error: fetchOrderError } = await supabaseClient
+        .from('orders')
+        .select('status, user_email')
+        .eq('cashfree_order_id', order_id)
+        .single();
+
+      if (fetchOrderError) {
+        log('warn', 'Failed to fetch existing order before verify', { error: fetchOrderError });
+      }
+
+      if (existingOrder?.status === 'completed') {
+        log('info', 'Order already completed, skipping email + verification', { order_id });
+        return new Response(
+          JSON.stringify({ success: true, alreadyCompleted: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
       // Verify payment with Cashfree
       const verifyResponse = await fetch(`${CASHFREE_BASE_URL}/orders/${order_id}/payments`, {
         method: 'GET',

@@ -6,6 +6,7 @@ import { SuspenseWrapper } from "./components/SuspenseWrapper";
 const App = lazy(() => import("./pages/App.tsx"));
 const Payment = lazy(() => import("./pages/PaymentProtected.tsx"));
 const Course = lazy(() => import("./pages/CourseProtected.tsx"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccessProtected.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
 const SignUp = lazy(() => import("./pages/SignUp.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
@@ -23,6 +24,7 @@ export const userRoutes: RouteObject[] = [
 	{ path: "contact", element: <SuspenseWrapper><Contact /></SuspenseWrapper>},
 	{ path: "faqs", element: <SuspenseWrapper><Faqs /></SuspenseWrapper>},
 	{ path: "payment", element: <SuspenseWrapper><Payment /></SuspenseWrapper>},
+	{ path: "payment-success", element: <SuspenseWrapper><PaymentSuccess /></SuspenseWrapper>},
 	{ path: "course", element: <SuspenseWrapper><Course /></SuspenseWrapper>},
 	{ path: "privacy-policy", element: <SuspenseWrapper><PrivacyPolicy /></SuspenseWrapper>},
 	{ path: "terms-of-use", element: <SuspenseWrapper><TermsOfUse /></SuspenseWrapper>},

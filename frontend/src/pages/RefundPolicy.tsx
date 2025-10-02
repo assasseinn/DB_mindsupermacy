@@ -8,9 +8,9 @@ export default function RefundPolicy() {
         
         <div className="space-y-8">
           <section className="bg-secondary/10 p-6 rounded-xl border border-accent/20">
-            <h2 className="text-2xl font-semibold mb-4 text-accent">1. 60-Day Money-Back Guarantee</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-accent">1. 15-Day Money-Back Guarantee</h2>
             <div className="space-y-4 text-white/80">
-              <p>We offer a 60-day money-back guarantee for our course. If you're not satisfied with your purchase, you can request a full refund within 60 days of your purchase date.</p>
+              <p>We offer a 15-day money-back guarantee for our course. If you're not satisfied with your purchase, you can request a full refund within 15 days of your purchase date.</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li>No questions asked</li>
                 <li>Full refund of your purchase amount</li>
@@ -51,7 +51,7 @@ export default function RefundPolicy() {
             <div className="space-y-4 text-white/80">
               <p>Refunds may not be available if:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Request is made after 60 days</li>
+                <li>Request is made after 15 days</li>
                 <li>Course content has been downloaded</li>
                 <li>Account shows signs of abuse</li>
                 <li>Terms of service have been violated</li>

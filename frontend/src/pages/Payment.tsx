@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,8 +28,6 @@ const securityBadges = [
   { icon: "🛡️", label: "Data Protection" },
   { icon: "⚡", label: "Instant Delivery" },
 ];
-
-import { ProtectedRoute } from "../components/ProtectedRoute";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
@@ -94,14 +92,7 @@ export default function PaymentPage() {
         throw new Error("Failed to save payment record");
       }
 
-      // Send confirmation email
-      await supabase.functions.invoke('send-payment-confirmation', {
-        body: { 
-          email: formData.email,
-          amount: orderData.order_amount,
-          orderId: orderData.order_id
-        }
-      });
+      // Email confirmation is handled by the verify endpoint (idempotent)
 
       // Track successful purchase in Google Analytics
       trackPurchase(
@@ -229,8 +220,17 @@ export default function PaymentPage() {
       // Configure Cashfree payment options
       const paymentOptions = {
         paymentSessionId: orderData.payment_session_id,
-        returnUrl: `${window.location.origin}/payment?status=success`,
+        returnUrl: `${window.location.origin}/payment-success`,
       };
+
+      // Persist order details for post-redirect verification
+      try {
+        localStorage.setItem('ms_last_order', JSON.stringify({
+          order_id: orderData.order_id,
+          order_amount: orderData.order_amount,
+          email: formData.email,
+        }));
+      } catch {}
 
       if (isDevelopment) {
         // Mock successful payment for development
@@ -312,11 +312,9 @@ export default function PaymentPage() {
         );
 
         setPaymentStatus('success');
-        
-        // Navigate to course after a short delay
-        setTimeout(() => {
-          navigate("/course");
-        }, 2000);
+
+        // Redirect to payment success page for consistent UX
+        navigate('/payment-success');
         
         return;
       }
@@ -473,7 +471,7 @@ export default function PaymentPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span className="font-medium">
-                    Only <span className="text-accent">23 copies</span> left at this price
+                    Final <span className="text-accent">few spots</span> before the price jumps
                   </span>
                 </div>
               </div>
@@ -488,9 +486,12 @@ export default function PaymentPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">60-Day Money-Back <span className="text-accent">"Soul"</span> Guarantee</h3>
+                  <h3 className="text-xl font-bold text-white">15-Day Money-Back <span className="text-accent">"Soul"</span> Guarantee</h3>
                   <p className="text-white/70">
-                    If these principles don't create a profound shift in your mindset and results, simply request a full refund.
+                    If these principles don't create a profound shift in your mindset and results, simply{' '}
+                    <Link to="/refund-policy" className="text-accent hover:text-accent/80 transition-colors">
+                      request a full refund
+                    </Link>.
                   </p>
                 </div>
               </div>
@@ -651,10 +652,31 @@ export default function PaymentPage() {
       <footer className="w-full py-8 text-center text-white/50 text-sm mt-auto">
         <div className="container mx-auto">
           <p>© {new Date().getFullYear()} MindSupremacy. All rights reserved.</p>
-          <p className="mt-2">
-            <span className="mx-2 hover:text-white/80 cursor-pointer transition-colors">Terms</span>
-            <span className="mx-2 hover:text-white/80 cursor-pointer transition-colors">Privacy</span>
-            <span className="mx-2 hover:text-white/80 cursor-pointer transition-colors">Contact</span>
+          <p className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-2">
+            <Link
+              to="/terms-of-use"
+              className="hover:text-white/80 transition-colors"
+            >
+              Terms of Use
+            </Link>
+            <Link
+              to="/privacy-policy"
+              className="hover:text-white/80 transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              to="/refund-policy"
+              className="hover:text-white/80 transition-colors"
+            >
+              Refund Policy
+            </Link>
+            <Link
+              to="/contact"
+              className="hover:text-white/80 transition-colors"
+            >
+              Contact
+            </Link>
           </p>
         </div>
       </footer>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { chapters, ChapterData } from "utils/courseData";
+import { trackCTAClick } from "utils/analytics";
 import { PrincipleIcon } from "components/PrincipleIcon";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -18,18 +19,63 @@ const videoCourseData = [
 
 const YOUTUBE_VIDEOS = {
   0: "cvzRTv9HHWs", // Introduction
-  1: "", // What is a Drifter - add video ID here
-  2: "", // The 1st Principle: Definiteness - add video ID here
-  3: "", // The 2nd Principle: Mastery over Self - add video ID here
-  4: "", // The 3rd Principle: Learning from Adversity - add video ID here
-  5: "", // The 4/5/6/7th Principle - add video ID here
-  6: "", // Summary - add video ID here
+  1: "YWBWica9XII", // What is a Drifter
+  2: "P5gCSSiQ5FE", // The 1st Principle: Definiteness of Purpose
+  3: "dC_VAVHpZYg", // The 2nd Principle: Mastery over Self
+  4: "xvih2OVuZ60", // The 3rd Principle: Learning from Adversity
+  5: "7xzJxy-pcQw", // The 4/5/6/7th Principle: Environmental Influence, Time, Harmony, Caution
+  6: "wNq4t5krv7M", // Summary
 };
 
 export default function CoursePage() {
   const [searchParams] = useSearchParams();
   const principleId = searchParams.get("id") || "three-feet";
   const navigate = useNavigate();
+  const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
+  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/` : "https://mindsupremacy.com/";
+  const shareMessage = "Unlock suppressed success principles with MindSupremacy.";
+  const shareText = `${shareMessage} ${shareUrl}`;
+  const shareOptions = [
+    {
+      name: "WhatsApp",
+      href: `https://wa.me/?text=${encodeURIComponent(shareText)}`,
+      analyticsLabel: "share_course_whatsapp",
+    },
+    {
+      name: "Instagram",
+      href: `https://www.instagram.com/stories/share/?url=${encodeURIComponent(shareUrl)}`,
+      analyticsLabel: "share_course_instagram",
+    },
+    {
+      name: "Facebook",
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      analyticsLabel: "share_course_facebook",
+    },
+    {
+      name: "LinkedIn",
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      analyticsLabel: "share_course_linkedin",
+    },
+  ];
+
+  const handleShareClick = async () => {
+    trackCTAClick("share_course", "course_page");
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      try {
+        await (navigator as any).share({
+          title: "MindSupremacy",
+          text: shareMessage,
+          url: shareUrl,
+        });
+        setIsShareMenuOpen(false);
+        return;
+      } catch (_error) {
+        // Ignore Web Share cancellation and fall back to manual options
+      }
+    }
+
+    setIsShareMenuOpen(prev => !prev);
+  };
   
   // Find the current chapter
   const currentChapter = chapters.find(chapter => chapter.id === principleId) || chapters[0];
@@ -354,15 +400,35 @@ export default function CoursePage() {
                 {/* CTA Card */}
                 <div className="bg-gradient-to-br from-accent/20 to-secondary/20 rounded-lg border border-accent/30 p-4 md:p-6 text-center">
                   <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">Share the wisdom and earn good karma.</h3>
-                  <a 
-                    href="/Payment"
-                    className="block w-full py-2 md:py-3 px-4 md:px-6 bg-accent text-black font-bold rounded-lg hover:bg-accent/90 transition-all duration-300 shadow-lg shadow-accent/20 group text-sm md:text-base"
+                  <button
+                    type="button"
+                    onClick={handleShareClick}
+                    className="group relative w-full py-2 md:py-3 px-4 md:px-6 bg-accent text-black font-bold rounded-lg hover:bg-accent/90 transition-all duration-300 shadow-lg shadow-accent/20 text-sm md:text-base"
                   >
                     Share Now
                     <div className="absolute inset-0 rounded-lg overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                       <div className="absolute inset-0 bg-white opacity-10 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     </div>
-                  </a>
+                  </button>
+                  {isShareMenuOpen && (
+                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                      {shareOptions.map(option => (
+                        <a
+                          key={option.name}
+                          href={option.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => {
+                            trackCTAClick(option.analyticsLabel, "course_page");
+                            setIsShareMenuOpen(false);
+                          }}
+                          className="flex items-center justify-center py-2 rounded-md border border-white/10 bg-black/10 hover:bg-black/20 transition-colors duration-300 text-white"
+                        >
+                          {option.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </aside>
